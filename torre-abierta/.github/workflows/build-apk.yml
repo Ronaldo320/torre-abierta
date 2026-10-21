@@ -1,0 +1,42 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar plataforma Android 34
+        run: (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Generar la app web
+        run: |
+          npm ci
+          node web/build.js
+
+      - name: Compilar y firmar el APK
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0" bash scripts/build-apk.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TorreAbierta-apk
+          path: |
+            dist/TorreAbierta.apk
+            dist/torre-abierta.html

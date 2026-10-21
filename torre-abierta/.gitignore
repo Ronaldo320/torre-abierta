@@ -1,0 +1,16 @@
+# Dependencias y archivos generados
+node_modules/
+dist/
+build/
+android/assets/
+
+# Llaves de firma: NUNCA subirlas al repositorio
+keystore/
+*.p12
+*.jks
+*.keystore
+*.pem
+
+# Sistema
+.DS_Store
+Thumbs.db
